@@ -1,5 +1,5 @@
 # SelfEco Plus
-Создан на основе [https://github.com/monobogdan](оригинального проекта SelfEco).
+Создан на основе [оригинального проекта SelfEco](https://github.com/monobogdan).
 
 ### Предыстория
 Это страницы проЭкта "сам себе экосистема". 
