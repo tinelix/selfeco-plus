@@ -20,7 +20,7 @@ notifications, there is a feed, there are walls, there are user profiles.
 In addition, the application has a full-fledged music section with search, downloading tracks<sup>\*</sup>
 and background listening<sup>\*</sup>.
 
-###### \* DISCLAIMER: These actions violate the VK Terms of Service. Claims to the author of the original project.
+###### \* DISCLAIMER: These actions violate the [https://vk.com/terms](VK Terms of Service). Claims to the author of the original project.
 
 ### YouTube (Invidious)
 Works via Invidous API. Since YouTube no longer knows how to serve videos on old mobile phones
