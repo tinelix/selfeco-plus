@@ -10,4 +10,8 @@
     <string name="no_available_video_info">Нет доступной информации о видео</string>
     <string name="cache_cleared">Кэш очищен.</string>
     <string name="about_app_title">О приложении</string>
+
+    <string name="settings_relay">Туннель-соединение</string>
+    <string name="settings_relay_description">Приложение соединяется с инстанцией через туннель minvk.ru</string>
+    <string name="settings">Настройки</string>
 </resources>

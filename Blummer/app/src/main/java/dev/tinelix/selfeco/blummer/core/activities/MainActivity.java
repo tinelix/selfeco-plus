@@ -366,6 +366,14 @@ public class MainActivity extends Activity {
                 return true;
             }
         });
+        menu.add(getResources().getString(R.string.settings)).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
+                startActivity(intent);
+                return true;
+            }
+        });
 
         return super.onCreateOptionsMenu(menu);
     }

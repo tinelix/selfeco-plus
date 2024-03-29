@@ -11,4 +11,8 @@
     <string name="loading_error_dialog_text">Load error occurred. Maybe, API has changed…</string>
     <string name="cache_cleared">The cache has been cleared.</string>
     <string name="about_app_title">About</string>
+
+    <string name="settings_relay">Tunnel connection</string>
+    <string name="settings_relay_description">The application connects to the instance via the minvk.ru tunnel</string>
+    <string name="settings">Settings</string>
 </resources>
