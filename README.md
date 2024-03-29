@@ -27,7 +27,7 @@ and background listening<sup>\*</sup>.
 ## Blummer
 ### Compact YouTube mobile front-end
 
-Works via [https://invidious.io/](Invidous) API. Since YouTube no longer knows how to serve videos on old mobile phones
+Works via [Invidous](https://invidious.io/) API. Since YouTube no longer knows how to serve videos on old mobile phones
 can load in a stream (working with the network puts a good load on the CPU), the client downloads
 them in a convenient way format and allows you to watch them offline or immediately. In general, with
 a fast Internet, loading.
