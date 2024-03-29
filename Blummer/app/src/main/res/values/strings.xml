@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name" translatable="false">Blummer</string>
+    <string name="credits_icons">Rakib Hassan Rahim, FreePik</string>
+    <string name="vlc_url">http://h168302.srv22.test-hf.su/miniyt/vlc.apk</string>
+    <string name="getting_info">Getting video information…</string>
+    <string name="loading">Loading…</string>
+    <string name="loading_with_percent">Loading… (%s %%)</string>
+    <string name="error_occurred">Error occurred</string>
+    <string name="error_dialog_text">Please try again. / Reason: %s</string>
+    <string name="no_available_video_info">No available video information</string>
+    <string name="loading_error_dialog_text">Load error occurred. Maybe, API has changed…</string>
+    <string name="cache_cleared">The cache has been cleared.</string>
+    <string name="about_app_title">About</string>
+</resources>

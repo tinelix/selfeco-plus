@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="version">Версия %s</string>
+    <string name="app_description">%s - это приложение, которое работает поверх сервиса Invidious в Android 2.1 и выше.</string>
+    <string name="app_description_2">Сделано с душой, на основе оригинального проекта SelfEco.</string>
+</resources>

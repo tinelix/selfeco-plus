@@ -1,0 +1,13 @@
+<resources>
+    <string name="credits_icons">Rakib Hassan Rahim, FreePik</string>
+    <string name="vlc_url">http://h168302.srv22.test-hf.su/miniyt/vlc.apk</string>
+    <string name="getting_info">Получение информации о видео…</string>
+    <string name="loading">Загрузка…</string>
+    <string name="loading_with_percent">Загрузка… (%s %%)</string>
+    <string name="error_occurred">Произошла ошибка</string>
+    <string name="error_dialog_text">Попробуйте еще раз.\n\nПричина: %s</string>
+    <string name="loading_error_dialog_text">На этапе загрузки данных произошла ошибка. Вероятно, API изменили…</string>
+    <string name="no_available_video_info">Нет доступной информации о видео</string>
+    <string name="cache_cleared">Кэш очищен.</string>
+    <string name="about_app_title">О приложении</string>
+</resources>

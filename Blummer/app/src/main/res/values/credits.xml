@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="version">Версия %s</string>
+    <string name="app_description">%s - is an application that runs on top of the Invidious service in Android 2.1 and higher.</string>
+    <string name="app_description_2">Made with soul, based on the original SelfEco project.</string>
+
+    <string name="app_copyright" translatable="false">
+        <![CDATA[
+            © 2023 Bogdan Nikolaev (aka. monobogdan)
+            <br>© 2024 Dmitry Tretyakov (aka. Tinelix)
+        ]]>
+    </string>
+</resources>
