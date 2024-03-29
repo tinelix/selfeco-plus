@@ -6,15 +6,14 @@ import android.support.annotation.Nullable;
 import android.text.Html;
 import android.widget.TextView;
 
-import com.monobodgan.selfeco.BuildConfig;
-import com.monobodgan.selfeco.R;
+import dev.tinelix.selfeco.blummer.BuildConfig;
+import dev.tinelix.selfeco.blummer.R;
 
 public class AboutActivity extends Activity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_about);
-
         inflateUI();
     }
 

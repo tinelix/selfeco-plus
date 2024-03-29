@@ -4,13 +4,20 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.util.Log;
 
+import org.pixmob.httpclient.HttpClient;
+import org.pixmob.httpclient.HttpRequestBuilder;
+import org.pixmob.httpclient.HttpResponse;
+
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.concurrent.Executors;
 
 import javax.net.ssl.HttpsURLConnection;
+
+import dev.tinelix.selfeco.blummer.core.utilities.SSLDummyChecker;
 
 public class VideoDownloader {
     private File cacheDir;
@@ -23,13 +30,18 @@ public class VideoDownloader {
     }
 
     private boolean jobInProgress;
+    private HttpClient httpClient = null;
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @SuppressLint("SdCardPath")
-    public VideoDownloader(Context ct)
+    public VideoDownloader(Context ctx)
     {
         cacheDir = new File("/sdcard/DCIM/selfeco-invidious/");
         cacheDir.mkdirs();
+        httpClient = new HttpClient(ctx);
+        httpClient.setConnectTimeout(30000);
+        httpClient.setReadTimeout(30000);
+        httpClient.setSSLStore(SSLDummyChecker.disableSSLCertificateChecking());
     }
 
     public File getCacheDir() {
@@ -65,14 +77,14 @@ public class VideoDownloader {
             public void run() {
                 try
                 {
-                    HttpsURLConnection conn = (HttpsURLConnection) new URL(url).openConnection();
-                    conn.setDoInput(true);
-                    conn.setRequestMethod("GET");
+                    HttpRequestBuilder request = httpClient.get(url);
+                    request.setupSecureConnection(SSLDummyChecker.disableSSLCertificateChecking());
+                    HttpResponse response = request.execute();
+                    assert response != null;
+                    InputStream response_in = response.getPayload();
+                    long content_length = response.getContentLength();
                     Log.i("", "run: " + fileName);
-                    conn.connect();
-
-                    int len = conn.getContentLength();
-                    BufferedInputStream reader = new BufferedInputStream(conn.getInputStream(), 4096000);
+                    BufferedInputStream reader = new BufferedInputStream(response_in, 4096000);
 
                     cached.createNewFile();
                     incompleted.createNewFile();
@@ -80,16 +92,15 @@ public class VideoDownloader {
                     byte[] buffer = new byte[4096000];
                     int numRead = 0;
 
-                    while(numRead < len)
+                    while(numRead < content_length)
                     {
                         int amt = reader.read(buffer);
                         os.write(buffer, 0, amt);
 
                         numRead += amt;
-                        cb.reportProgress(numRead / 1024, len / 1024);
+                        cb.reportProgress(numRead / 1024, (int) (content_length / 1024));
                     }
 
-                    conn.disconnect();
                     os.close();
                     incompleted.delete();
                     cb.success(cached.getAbsolutePath());

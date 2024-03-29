@@ -14,8 +14,9 @@
         android:layout_width="128dp"
         android:layout_height="64dp"
         android:layout_weight="1"
+        android:background="@drawable/ic_videocam"
         android:clickable="false"
-        tools:src="@android:drawable/ic_dialog_email" />
+        tools:src="@drawable/ic_videocam" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -27,28 +28,24 @@
             android:id="@+id/video_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="5dp"
             android:layout_marginLeft="5dp"
+            android:layout_marginStart="5dp"
             android:layout_weight="1"
             android:clickable="false"
-            android:text="Name" />
+            android:text="Name"
+            android:textSize="18sp" />
 
-        <LinearLayout
+        <TextView
+            android:id="@+id/video_desc"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="horizontal"
-            android:paddingLeft="5dp">
-
-            <TextView
-                android:id="@+id/video_desc"
-                android:layout_width="120dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="TextView"
-                android:textSize="12sp" />
-
-        </LinearLayout>
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_marginTop="5dp"
+            android:singleLine="true"
+            android:text="Description"
+            android:textColor="?android:attr/textColorTertiary"
+            android:textSize="12sp" />
 
     </LinearLayout>
 

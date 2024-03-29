@@ -21,6 +21,15 @@ import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+
+/**
+ *  YouTube/Invidious API client original implementation
+ *
+ *  @author monobogdan
+ *  @deprecated Use InvidiousAPI with Wrapped HTTPConnection on some devices.
+ */
+
+@Deprecated
 public class YTAPI {
 
     private final String instance = "https://inv.tux.pizza/api/v1/";

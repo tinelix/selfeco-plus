@@ -17,12 +17,13 @@ import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 
 import dev.tinelix.selfeco.blummer.api.YTAPI;
+import dev.tinelix.selfeco.blummer.api.entities.Video;
 
 public class History {
     private final String fileName = "/history.json";
 
     private File hFile;
-    private ArrayList<YTAPI.Video> videos;
+    private ArrayList<Video> videos;
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     public History(Context ctx)
@@ -58,7 +59,7 @@ public class History {
 
             for(int i = 0; i < arr.length(); i++)
             {
-                YTAPI.Video vid = new YTAPI.Video();
+                Video vid = new Video();
                 JSONObject vidObj = arr.getJSONObject(i);
 
                 vid.id = vidObj.getString("id");
@@ -78,11 +79,11 @@ public class History {
         }
     }
 
-    public ArrayList<YTAPI.Video> getVideos() {
+    public ArrayList<Video> getVideos() {
         return videos;
     }
 
-    public void put(YTAPI.Video video)
+    public void put(Video video)
     {
         videos.add(0, video);
 
@@ -90,7 +91,7 @@ public class History {
             videos.remove(videos.size() - 1);
 
         JSONArray arr = new JSONArray();
-        for(YTAPI.Video vid : videos)
+        for(Video vid : videos)
         {
             try {
                 JSONObject obj = new JSONObject();

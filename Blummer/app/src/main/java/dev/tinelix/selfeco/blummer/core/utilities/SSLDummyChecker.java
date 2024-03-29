@@ -11,12 +11,13 @@ import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSession;
+import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
 public class SSLDummyChecker {
 
-    public static void disableSSLCertificateChecking() {
+    public static SSLSocketFactory disableSSLCertificateChecking() {
         TrustManager[] trustAllCerts = new TrustManager[] { new X509TrustManager() {
             public X509Certificate[] getAcceptedIssuers() {
                 return null;
@@ -36,15 +37,13 @@ public class SSLDummyChecker {
 
         try {
             SSLContext sc = SSLContext.getInstance("TLS");
-
             sc.init(null, trustAllCerts, new java.security.SecureRandom());
-
-            HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
-            HttpsURLConnection.setDefaultHostnameVerifier(new HostnameVerifier() { @Override public boolean verify(String hostname, SSLSession session) { return true; } });
+            return sc.getSocketFactory();
         } catch (KeyManagementException e) {
             e.printStackTrace();
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         }
+        return null;
     }
 }

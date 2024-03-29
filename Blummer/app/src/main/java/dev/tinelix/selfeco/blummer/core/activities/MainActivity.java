@@ -7,6 +7,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -21,11 +22,13 @@ import android.widget.TabHost;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.monobodgan.selfeco.BuildConfig;
-import com.monobodgan.selfeco.R;
+import dev.tinelix.selfeco.blummer.R;
+import dev.tinelix.selfeco.blummer.api.InvidiousAPI;
+import dev.tinelix.selfeco.blummer.api.entities.Video;
 import dev.tinelix.selfeco.blummer.api.models.History;
 import dev.tinelix.selfeco.blummer.api.VideoDownloader;
 import dev.tinelix.selfeco.blummer.api.YTAPI;
+import dev.tinelix.selfeco.blummer.core.Global;
 import dev.tinelix.selfeco.blummer.core.utilities.SSLDummyChecker;
 
 import org.json.JSONArray;
@@ -37,18 +40,18 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 
 public class MainActivity extends Activity {
-    private YTAPI api;
+    private InvidiousAPI api;
     private TabHost tabs;
 
     private History history;
-    private ArrayList<YTAPI.Video> videos;
+    private ArrayList<Video> videos;
 
     private ViewGroup trendsView;
     private View loadingView;
 
     private VideoDownloader downloader;
 
-    public YTAPI getApi() {
+    public InvidiousAPI getApi() {
         return api;
     }
 
@@ -60,11 +63,11 @@ public class MainActivity extends Activity {
         return al;
     }
 
-    private void inflateUI(View parent, ArrayList<YTAPI.Video> videos) {
+    private void inflateUI(View parent, ArrayList<Video> videos) {
         ((ViewGroup) parent).removeAllViews();
 
-        for (final YTAPI.Video video : videos) {
-            View fragment = getLayoutInflater().inflate(R.layout.frag_video, null, false);
+        for (final Video video : videos) {
+            View fragment = getLayoutInflater().inflate(R.layout.list_item_video, null, false);
 
             fragment.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -80,9 +83,9 @@ public class MainActivity extends Activity {
             vDesc.setText(video.length);
             final ImageView vPreview = fragment.findViewById(R.id.video_preview);
 
-            api.schedulePreviewDownload(video.preview, video.id + ".png", new YTAPI.PreviewCallback() {
+            api.schedulePreviewDownload(video.preview, video.id + ".png", new InvidiousAPI.APIPreviewCallback() {
                 @Override
-                public void loaded(final Bitmap scaledBitmap) {
+                public void onLoad(final Bitmap scaledBitmap) {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -92,7 +95,7 @@ public class MainActivity extends Activity {
                 }
 
                 @Override
-                public void error(String reason) {
+                public void onError(String reason) {
 
                 }
             });
@@ -107,7 +110,7 @@ public class MainActivity extends Activity {
         startActivity(intent);
     }
 
-    private void onPlayVideo(YTAPI.Video video) {
+    private void onPlayVideo(Video video) {
         Log.i("TAG", "onPlayVideo: Fetching video...");
 
         final ProgressDialog preDialog = new ProgressDialog(MainActivity.this);
@@ -115,11 +118,11 @@ public class MainActivity extends Activity {
         preDialog.setCancelable(false);
         preDialog.show();
 
-        api.request("videos/" + video.id, new YTAPI.Callback() {
+        api.request("videos/" + video.id, new InvidiousAPI.APICallback() {
             @Override
-            public void success(String obj) {
+            public void onSuccess(String obj) {
                 try {
-                    YTAPI.Video video = api.getVideoDescription(new JSONObject(obj));
+                    Video video = api.getVideoDescription(new JSONObject(obj));
 
                     preDialog.cancel();
 
@@ -182,7 +185,7 @@ public class MainActivity extends Activity {
             }
 
             @Override
-            public void error(String reason) {
+            public void onError(String reason) {
                 buildGenericError(MainActivity.this, "Не удалось получить данные о видео :(").show();
             }
         });
@@ -191,9 +194,9 @@ public class MainActivity extends Activity {
     public void onSearch(View view) {
         String query = ((EditText) findViewById(R.id.query_search)).getText().toString();
 
-        api.request("search?q=" + URLEncoder.encode(query) + "&type=video&region=RU&hl=ru", new YTAPI.Callback() {
+        api.request("search?q=" + URLEncoder.encode(query) + "&type=video&region=RU&hl=ru", new InvidiousAPI.APICallback() {
             @Override
-            public void success(String obj) {
+            public void onSuccess(String obj) {
                 try {
                     videos = api.getVideoList(new JSONArray(obj));
 
@@ -206,7 +209,7 @@ public class MainActivity extends Activity {
             }
 
             @Override
-            public void error(String reason) {
+            public void onError(String reason) {
                 Log.i("", "error: ");
                 buildGenericError(MainActivity.this, reason).show();
             }
@@ -214,9 +217,9 @@ public class MainActivity extends Activity {
     }
 
     private void updateTrending() {
-        api.request("trending?region=RU&hl=ru", new YTAPI.Callback() {
+        api.request("trending?region=RU&hl=ru", new InvidiousAPI.APICallback() {
             @Override
-            public void success(String obj) {
+            public void onSuccess(String obj) {
                 try {
                     videos = api.getVideoList(new JSONArray(obj));
 
@@ -229,7 +232,7 @@ public class MainActivity extends Activity {
             }
 
             @Override
-            public void error(String reason) {
+            public void onError(String reason) {
                 Log.i("", "error: ");
                 buildGenericError(MainActivity.this, reason).show();
             }
@@ -237,9 +240,9 @@ public class MainActivity extends Activity {
     }
 
     private void updatePopular() {
-        api.request("popular?region=RU&hl=ru", new YTAPI.Callback() {
+        api.request("popular?region=RU&hl=ru", new InvidiousAPI.APICallback() {
             @Override
-            public void success(String obj) {
+            public void onSuccess(String obj) {
                 //loadingView.setVisibility(View.GONE);
 
                 try {
@@ -254,7 +257,7 @@ public class MainActivity extends Activity {
             }
 
             @Override
-            public void error(String reason) {
+            public void onError(String reason) {
                 Log.i("", "error: ");
                 buildGenericError(MainActivity.this, reason).show();
             }
@@ -286,29 +289,37 @@ public class MainActivity extends Activity {
 
         history = new History(this);
 
-        api = new YTAPI(this);
+        api = new InvidiousAPI(this, "");
         downloader = new VideoDownloader(this);
         downloader.createCacheFolder();
 
         setContentView(R.layout.activity_main);
-        tabs = (TabHost) findViewById(R.id.tab_host);
+        tabs = findViewById(R.id.tab_host);
         tabs.setup();
         tabs.addTab(tabs.newTabSpec("trends")
                 .setIndicator(
-                        "Тренды", getResources().getDrawable(R.drawable.trending)
+                        "Тренды",
+                        Global.tintDrawable(
+                                this,
+                                R.drawable.ic_trending_up,
+                                Color.WHITE
+                        )
                 ).setContent(R.id.tab1));
         tabs.addTab(tabs.newTabSpec("popular")
                 .setIndicator(
-                        "Популярное", getResources().getDrawable(R.drawable.star)
+                        "Популярное",
+                        Global.tintDrawable(this, R.drawable.ic_star, Color.WHITE)
                 ).setContent(R.id.tab2)
         );
         tabs.addTab(tabs.newTabSpec("history")
                 .setIndicator(
-                        "История", getResources().getDrawable(R.drawable.history)
+                        "История",
+                        Global.tintDrawable(this, R.drawable.ic_history, Color.WHITE)
         ).setContent(R.id.tab3));
         tabs.addTab(tabs.newTabSpec("search")
                 .setIndicator(
-                        "Поиск", getResources().getDrawable(R.drawable.search)
+                        "Поиск",
+                        Global.tintDrawable(this, R.drawable.ic_search, Color.WHITE)
                 ).setContent(R.id.tab4));
 
         tabs.setOnTabChangedListener(new TabHost.OnTabChangeListener() {
