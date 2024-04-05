@@ -8,10 +8,15 @@
     <string name="error_dialog_text">Попробуйте еще раз.\n\nПричина: %s</string>
     <string name="loading_error_dialog_text">На этапе загрузки данных произошла ошибка. Вероятно, API изменили…</string>
     <string name="no_available_video_info">Нет доступной информации о видео</string>
+    <string name="clear_cache">Очистить кэш</string>
     <string name="cache_cleared">Кэш очищен.</string>
     <string name="about_app_title">О приложении</string>
 
+    <string name="settings">Настройки</string>
+    <string name="network_category">Сеть</string>
     <string name="settings_relay">Туннель-соединение</string>
     <string name="settings_relay_description">Приложение соединяется с инстанцией через туннель minvk.ru</string>
-    <string name="settings">Настройки</string>
+    <string name="settings_proxy">Прокси-соеднинение</string>
+    <string name="settings_proxy_settings">Настройки прокси-сервера</string>
+    <string name="proxy_address">Адрес</string>
 </resources>

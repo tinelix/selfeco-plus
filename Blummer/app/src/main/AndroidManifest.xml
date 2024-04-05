@@ -23,7 +23,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true"
-        tools:ignore="UnusedAttribute">
+        tools:ignore="GoogleAppIndexingWarning,UnusedAttribute"
+        android:fullBackupContent="@xml/backup_descriptor">
         <activity android:name="dev.tinelix.selfeco.blummer.core.activities.MainActivity"
             android:theme="@style/AppTheme">
             <intent-filter>
@@ -31,19 +32,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="dev.tinelix.selfeco.blummer.core.activities.SettingsActivity"
-            android:theme="@style/AppTheme">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-        <activity android:name="dev.tinelix.selfeco.blummer.core.activities.AboutActivity"
-            android:theme="@style/AppTheme">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+        <activity
+            android:name="dev.tinelix.selfeco.blummer.core.activities.SettingsActivity"
+            android:theme="@style/AppTheme" />
+        <activity
+            android:name="dev.tinelix.selfeco.blummer.core.activities.AboutActivity"
+            android:theme="@style/AppTheme" />
     </application>
 </manifest>

@@ -6,11 +6,13 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -38,6 +40,7 @@ import org.json.JSONObject;
 import java.io.File;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class MainActivity extends Activity {
     private InvidiousAPI api;
@@ -50,17 +53,87 @@ public class MainActivity extends Activity {
     private View loadingView;
 
     private VideoDownloader downloader;
+    private boolean isActive;
 
     public InvidiousAPI getApi() {
         return api;
     }
 
     public static AlertDialog.Builder buildGenericError(Context ctx, String errorString) {
+        if(errorString.length() > 120) {
+            errorString = String.format("%s...", errorString.substring(0, 120));
+        }
         AlertDialog.Builder al = new AlertDialog.Builder(ctx)
                 .setMessage(errorString)
                 .setTitle(ctx.getResources().getString(R.string.error_occurred));
         al.show();
         return al;
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        SSLDummyChecker.disableSSLCertificateChecking();
+
+        isActive = true;
+
+        history = new History(this);
+        api = new InvidiousAPI(this, getClientSettings());
+        downloader = new VideoDownloader(this);
+        downloader.createCacheFolder();
+
+        setContentView(R.layout.activity_main);
+        tabs = findViewById(R.id.tab_host);
+        tabs.setup();
+        tabs.addTab(tabs.newTabSpec("trends")
+                .setIndicator(
+                        "Тренды",
+                        Global.tintDrawable(
+                                this,
+                                R.drawable.ic_trending_up,
+                                Color.WHITE
+                        )
+                ).setContent(R.id.tab1));
+        tabs.addTab(tabs.newTabSpec("popular")
+                .setIndicator(
+                        "Популярное",
+                        Global.tintDrawable(this, R.drawable.ic_star, Color.WHITE)
+                ).setContent(R.id.tab2)
+        );
+        tabs.addTab(tabs.newTabSpec("history")
+                .setIndicator(
+                        "История",
+                        Global.tintDrawable(this, R.drawable.ic_history, Color.WHITE)
+                ).setContent(R.id.tab3));
+        tabs.addTab(tabs.newTabSpec("search")
+                .setIndicator(
+                        "Поиск",
+                        Global.tintDrawable(this, R.drawable.ic_search, Color.WHITE)
+                ).setContent(R.id.tab4));
+
+        tabs.setOnTabChangedListener(new TabHost.OnTabChangeListener() {
+            @Override
+            public void onTabChanged(String tabId) {
+                if (tabId.equals("popular"))
+                    updatePopular();
+            }
+        });
+
+        prepareUI();
+
+        updateTrending();
+        updateHistory();
+    }
+
+    private HashMap<String, Object> getClientSettings() {
+        SharedPreferences global_prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        HashMap<String, Object> settings = new HashMap<>();
+        settings.put("instance", "");
+        settings.put("useRelay", global_prefs.getBoolean("useRelay", true));
+        settings.put("useProxy", global_prefs.getBoolean("useProxy", false));
+        settings.put("proxyAddress", global_prefs.getString("proxyAddress", ""));
+        return settings;
     }
 
     private void inflateUI(View parent, ArrayList<Video> videos) {
@@ -106,7 +179,6 @@ public class MainActivity extends Activity {
         Intent intent = new Intent();
         intent.setAction(Intent.ACTION_VIEW);
         intent.setDataAndType(Uri.parse(url), "video/mp4");
-
         startActivity(intent);
     }
 
@@ -167,11 +239,7 @@ public class MainActivity extends Activity {
                                     @Override
                                     public void run() {
                                         dlg.cancel();
-
-                                        new AlertDialog.Builder(MainActivity.this)
-                                                .setTitle(getResources().getString(R.string.error_occurred))
-                                                .setMessage(getResources().getString(R.string.error_dialog_text, reason))
-                                                .show();
+                                        buildGenericError(MainActivity.this, reason);
                                     }
                                 });
 
@@ -226,7 +294,6 @@ public class MainActivity extends Activity {
                     inflateUI(findViewById(R.id.trends_content), videos);
                 } catch (JSONException e) {
                     buildGenericError(MainActivity.this, getResources().getString(R.string.loading_error_dialog_text));
-
                     e.printStackTrace();
                 }
             }
@@ -282,81 +349,28 @@ public class MainActivity extends Activity {
     }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        SSLDummyChecker.disableSSLCertificateChecking();
-
-        history = new History(this);
-
-        api = new InvidiousAPI(this, "");
-        downloader = new VideoDownloader(this);
-        downloader.createCacheFolder();
-
-        setContentView(R.layout.activity_main);
-        tabs = findViewById(R.id.tab_host);
-        tabs.setup();
-        tabs.addTab(tabs.newTabSpec("trends")
-                .setIndicator(
-                        "Тренды",
-                        Global.tintDrawable(
-                                this,
-                                R.drawable.ic_trending_up,
-                                Color.WHITE
-                        )
-                ).setContent(R.id.tab1));
-        tabs.addTab(tabs.newTabSpec("popular")
-                .setIndicator(
-                        "Популярное",
-                        Global.tintDrawable(this, R.drawable.ic_star, Color.WHITE)
-                ).setContent(R.id.tab2)
-        );
-        tabs.addTab(tabs.newTabSpec("history")
-                .setIndicator(
-                        "История",
-                        Global.tintDrawable(this, R.drawable.ic_history, Color.WHITE)
-        ).setContent(R.id.tab3));
-        tabs.addTab(tabs.newTabSpec("search")
-                .setIndicator(
-                        "Поиск",
-                        Global.tintDrawable(this, R.drawable.ic_search, Color.WHITE)
-                ).setContent(R.id.tab4));
-
-        tabs.setOnTabChangedListener(new TabHost.OnTabChangeListener() {
-            @Override
-            public void onTabChanged(String tabId) {
-                if (tabId.equals("popular"))
-                    updatePopular();
-            }
-        });
-
-        prepareUI();
-
-        updateTrending();
-        updateHistory();
-    }
-
-    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        menu.add("Очистить кэш").setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-            @SuppressWarnings("ResultOfMethodCallIgnored")
-            @Override
-            public boolean onMenuItemClick(MenuItem menuItem) {
-                File[] files = downloader.getCacheDir().listFiles();
-                if(files != null) {
-                    for (File f : files) {
-                        if (!f.isDirectory())
-                            f.delete();
-                    }
+        menu.add(getResources().getString(R.string.clear_cache)).setOnMenuItemClickListener(
+                new MenuItem.OnMenuItemClickListener() {
+                    @SuppressWarnings("ResultOfMethodCallIgnored")
+                    @Override
+                    public boolean onMenuItemClick(MenuItem menuItem) {
+                        File[] files = downloader.getCacheDir().listFiles();
+                        if(files != null) {
+                            for (File f : files) {
+                                if (!f.isDirectory())
+                                    f.delete();
+                            }
 
-                    Toast.makeText(
-                            MainActivity.this, getResources().getString(R.string.cache_cleared),
-                            Toast.LENGTH_SHORT
-                    ).show();
-                }
-                return true;
+                            Toast.makeText(
+                                    MainActivity.this, getResources().getString(R.string.cache_cleared),
+                                    Toast.LENGTH_SHORT
+                            ).show();
+                        }
+                        return true;
+                    }
             }
-        });
+        );
 
         menu.add(getResources().getString(R.string.about_app_title)).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
@@ -376,5 +390,17 @@ public class MainActivity extends Activity {
         });
 
         return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    protected void onResume() {
+        isActive = true;
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        isActive = false;
+        super.onPause();
     }
 }

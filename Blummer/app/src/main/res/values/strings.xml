@@ -12,7 +12,12 @@
     <string name="cache_cleared">The cache has been cleared.</string>
     <string name="about_app_title">About</string>
 
+
+    <string name="settings">Settings</string>
+    <string name="network_category">Network</string>
     <string name="settings_relay">Tunnel connection</string>
     <string name="settings_relay_description">The application connects to the instance via the minvk.ru tunnel</string>
-    <string name="settings">Settings</string>
+    <string name="settings_proxy">Proxy connection</string>
+    <string name="settings_proxy_settings">Proxy server settings</string>
+    <string name="proxy_address">Address</string>
 </resources>

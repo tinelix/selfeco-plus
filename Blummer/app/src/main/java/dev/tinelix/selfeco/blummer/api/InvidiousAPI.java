@@ -17,9 +17,11 @@ import org.pixmob.httpclient.HttpResponse;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -28,10 +30,13 @@ import dev.tinelix.selfeco.blummer.core.utilities.SSLDummyChecker;
 
 public class InvidiousAPI {
 
-    private String instance = "https://inv.tux.pizza/api/v1/";
+    private String proxyAddress;
+    private String instance = "https://invidious.jing.rocks/api/v1/";
     private final static String RELAY = "http://minvk.ru/apirelay.php";
     private final static String USER_AGENT = "Mozilla/4.0 (compatible; MSIE 4.01; Windows NT)";
     private final static String TAG = "InvidiousAPI";
+    private boolean useRelay = true;
+    private boolean useProxy = false;
     private final Handler handler;
     private final Context ctx;
     private HttpClient httpClient = null;
@@ -50,15 +55,29 @@ public class InvidiousAPI {
 
     private ExecutorService imageLoaderThreadPool;
 
-    public InvidiousAPI(Context ctx, String instance)
+    public InvidiousAPI(Context ctx, HashMap<String, Object> map)
     {
-        if(instance != null && instance.length() > 0) {
-            this.instance = instance;
+        httpClient = new HttpClient(ctx);
+
+        if(map.get("instance") instanceof String && ((String) map.get("instance")).length() > 0) {
+            this.instance = (String) map.get("instance");
         }
+        useRelay = (boolean) map.get("useRelay");
+        useProxy = (boolean) map.get("useProxy");
+        if(useProxy) {
+            proxyAddress = (String) map.get("proxyAddress");
+            if(proxyAddress.contains(":"))
+                httpClient.setProxy(
+                        proxyAddress.split(":")[0],
+                        Integer.parseInt(proxyAddress.split(":")[1])
+                );
+            else
+                httpClient.setProxy(proxyAddress, 8080);
+        }
+
         this.ctx = ctx;
         this.handler = new Handler(Looper.getMainLooper());
         imageLoaderThreadPool = Executors.newFixedThreadPool(3);
-        httpClient = new HttpClient(ctx);
         httpClient.setConnectTimeout(30000);
         httpClient.setReadTimeout(30000);
         httpClient.setUserAgent(USER_AGENT);
@@ -71,8 +90,7 @@ public class InvidiousAPI {
             @SuppressWarnings("ResultOfMethodCallIgnored")
             @Override
             public void run() {
-                try
-                {
+                try {
                     File cacheDir = new File(ctx.getApplicationContext().getCacheDir().getAbsolutePath() + "/preview/");
                     cacheDir.mkdir();
                     File cachedPreview = new File(cacheDir.getAbsolutePath() + cacheName);
@@ -81,12 +99,10 @@ public class InvidiousAPI {
 
                     long filesize = 0;
 
-                    if(cachedPreview.exists())
-                    {
+                    if(cachedPreview.exists()) {
                         bmp = BitmapFactory.decodeFile(cachedPreview.getAbsolutePath());
-                    }
-                    else {
-                        HttpRequestBuilder request = httpClient.post(RELAY);
+                    } else {
+                        HttpRequestBuilder request = httpClient.post(useRelay ? RELAY : url);
                         request.content(
                                 url.getBytes(),
                                 null
@@ -121,9 +137,7 @@ public class InvidiousAPI {
                     }
                     //callback.error("Ошибка при загрузке значков");
 
-                }
-                catch (final Exception e)
-                {
+                } catch (final Exception e) {
                     e.printStackTrace();
                     handler.post(new Runnable() {
                         @Override
@@ -192,13 +206,23 @@ public class InvidiousAPI {
             public void run() {
                 try
                 {
-                    HttpRequestBuilder request = httpClient.post(RELAY);
+                    if(useProxy) {
+                        instance = instance.replace("https://", "http://");
+                    }
+                    HttpRequestBuilder request;
+                    if(useRelay) {
+                        request = httpClient.post(RELAY);
+                    } else {
+                        request = httpClient.get(instance + method);
+                    }
                     httpClient.setSSLStore(SSLDummyChecker.disableSSLCertificateChecking());
                     request.setupSecureConnection(httpClient.getSSLStore());
-                    request.content(
-                            String.format("%s%s", instance, method).getBytes(),
-                            null
-                    );
+                    if(useRelay) {
+                        request.content(
+                                String.format("%s%s", instance, method).getBytes(),
+                                null
+                        );
+                    }
                     HttpResponse response = request.execute();
                     assert response != null;
                     final String response_body = response.readString();
@@ -210,9 +234,9 @@ public class InvidiousAPI {
                             runnable.onSuccess(response_body);
                         }
                     });
-                }
-                catch (final Exception e)
-                {
+                } catch (IOException ignored) {
+
+                } catch (final Exception e) {
                     e.printStackTrace();
                     handler.post(new Runnable() {
                         @Override

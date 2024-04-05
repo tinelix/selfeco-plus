@@ -58,12 +58,12 @@ public class VideoDownloader {
         if(jobInProgress)
         {
             cb.failed("Загрузка уже идёт");
-
             return;
         }
-
-        final File incompleted = new File(cacheDir.getAbsolutePath() + "/" + fileName + ".incompleted");
-        final File cached = new File(cacheDir.getAbsolutePath() + "/" + fileName + ".mp4");
+        String fullFileName = String.format("%s/%s.mp4", cacheDir.getAbsolutePath(), fileName);
+        final File incompleted = new File(String.format("%s/%s.bin", cacheDir.getAbsolutePath(), fileName));
+        final File cached = new File(fullFileName);
+        Log.d("InvidiousDl", String.format("Downloading to %s...", fullFileName));
         if(cached.exists() && !incompleted.exists())
         {
             cb.success(cached.getAbsolutePath());

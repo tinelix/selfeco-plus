@@ -1,9 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <CheckBoxPreference
-        android:defaultValue="false"
-        android:key="relay"
-        android:summary="@string/settings_relay_description"
-        android:title="@string/settings_relay" />
+    <PreferenceCategory android:title="@string/network_category">
+
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="useRelay"
+            android:summary="@string/settings_relay_description"
+            android:title="@string/settings_relay" />
+        <CheckBoxPreference
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:defaultValue="false"
+            android:key="useProxy"
+            android:title="@string/settings_proxy" />
+        <Preference
+            android:key="proxySettings"
+            android:title="@string/settings_proxy_settings" />
+    </PreferenceCategory>
 </PreferenceScreen>
