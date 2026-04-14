@@ -4,7 +4,11 @@
 
 
 	header("Content-Type: text/json");
-	$request = file_get_contents("php://input");
+
+	if(isset($_GET["goto"]))
+		$request = $_GET["goto"];
+	else
+		$request = file_get_contents("php://input");
 	
 	$curl = curl_init($request);
 	curl_exec($curl);
