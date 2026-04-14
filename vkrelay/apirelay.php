@@ -11,7 +11,7 @@
 	$curl = curl_init($request);
 	curl_exec($curl);
 
-	$statusCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+	$statusCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
 
 	if($statusCode === 301 && str_starts_with($request, "http://")) {
 		$request = str_replace("http://", "https://", $request);
